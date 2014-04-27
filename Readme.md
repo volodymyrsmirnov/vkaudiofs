@@ -14,7 +14,7 @@ Current limitation is 6000 audio files per account.
 
 1. Install prerequisites:
     - **OSX**: *brew install pkg-config osxfuse glib json-c*
-    - **Debian / Ubuntu**: *sudo apt-get install build-essential git pkg-config fuse libfuse-dev libglib2.0-dev libjson0-dev*
+    - **Debian / Ubuntu**: *sudo apt-get install build-essential git pkg-config fuse libcurl4-openssl-dev libfuse-dev libglib2.0-dev libjson0-dev*
 2. Optionally you can change VK_APP_ID in include/config.h to match your application id. You can generate new standalone app here: [http://vk.com/editapp?act=create](http://vk.com/editapp?act=create).
 3. Clone repository: *git clone https://github.com/mindcollapse/vkaudiofs.git*
 4. Build and install: *cd vkaudiofs && make && make install*

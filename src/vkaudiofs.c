@@ -224,10 +224,12 @@ int main(gint argc, gchar * argv[])
     GList *iterator = NULL;
     gint file_number = 0;
     gsize cached_file_size = 0;
+    gsize cache_file_data_size = 0;
     gchar *progress = NULL;
     gchar *cache_file_path = g_build_path(G_DIR_SEPARATOR_S, g_get_user_cache_dir(), "vkaudiofs", NULL);
     gchar *size_formatted = NULL;
     gchar *audio_file_id_key = NULL;
+    gchar *cache_file_data = NULL;
     vkaudiofs_audio_file *audio_file = NULL;
    
     setlocale(LC_CTYPE, "");
@@ -314,15 +316,18 @@ int main(gint argc, gchar * argv[])
         g_free(audio_file_id_key);
     }
     
-    if (!g_key_file_save_to_file(cache_file, cache_file_path, NULL))
+    cache_file_data = g_key_file_to_data(cache_file, &cache_file_data_size, NULL);
+    
+    if (!g_file_set_contents(cache_file_path, cache_file_data, cache_file_data_size, NULL))
     {
-        g_critical("Cache file could not be saved, check that you have write access for path %s.", cache_file_path);
+        g_critical("Cache file could not be saved, check your write permissions for path %s.", cache_file_path);
         
         return EXIT_FAILURE;
     }
     
     g_key_file_free(cache_file);
     
+    g_free(cache_file_data);
     g_free(iterator);
     g_free(cache_file_path);
 

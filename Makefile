@@ -1,9 +1,9 @@
-LIBS = glib-2.0 json-c fuse
+LIBS = glib-2.0 json fuse
 
 CC = gcc
 
 CFLAGS = -std=gnu99 -pedantic -Wall -Wextra -O3 -Iinclude
-LDFLAGS = -lcurl -Qunused-arguments
+LDFLAGS = -lcurl
 
 TARGET  = vkaudiofs
 SOURCES = $(shell echo src/*.c)
