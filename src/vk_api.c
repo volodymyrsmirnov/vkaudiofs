@@ -9,6 +9,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <pthread.h>
 
 #include <glib.h>
 #include <fuse.h>
@@ -44,7 +45,7 @@ gint vkaudiofs_call_api(gchar *method, gchar *query, gchar **response)
     response_data.size = 0;
     response_data.data = g_malloc(4096);
     response_data.data[0] = '\0';
-
+    
     if (curl)
     {
         curl_easy_setopt(curl, CURLOPT_URL, api_query_url);
@@ -108,7 +109,9 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config)
             
             audio_files[idx].file_name = g_strdelimit(g_strdup_printf("%s - %s.%d.mp3", audio_files[idx].artist, audio_files[idx].title, audio_files[idx].id), "/ ", '_');
             
-            audio_files[idx].curl_instance = g_malloc(sizeof(CURL));
+            audio_files[idx].curl_instance = NULL;
+
+            pthread_mutex_init(&audio_files[idx].lock, NULL);
             
             g_hash_table_replace(config->files_id_table, &audio_files[idx].id, &audio_files[idx]);
             g_hash_table_replace(config->files_name_table, audio_files[idx].file_name, &audio_files[idx]);
@@ -193,7 +196,6 @@ gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, of
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_RANGE, request_range);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_write_data);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEDATA, &response_data);
-    curl_easy_setopt(audio_file->curl_instance, CURLOPT_TCP_KEEPALIVE, 1L);
     
     response_status = curl_easy_perform(audio_file->curl_instance);
     

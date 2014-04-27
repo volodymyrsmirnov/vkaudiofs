@@ -36,6 +36,8 @@ typedef struct vkaudiofs_audio_file {
     gchar *file_name;
     gsize size;
     
+    pthread_mutex_t lock;
+    
     CURL *curl_instance;
 } vkaudiofs_audio_file;
 

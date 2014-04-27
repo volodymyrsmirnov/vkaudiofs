@@ -46,8 +46,8 @@
 		B2D9BC091908EF7800A6EFE3 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				B2D9BC1419094B8B00A6EFE3 /* vk_api.c */,
 				B2DCE680190C48750035E607 /* vkaudiofs.c */,
+				B2D9BC1419094B8B00A6EFE3 /* vk_api.c */,
 			);
 			path = src;
 			sourceTree = "<group>";

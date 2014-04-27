@@ -11,6 +11,7 @@
 #include <string.h>
 #include <errno.h>
 #include <locale.h>
+#include <pthread.h>
 
 #include <glib.h>
 #include <fuse.h>
@@ -67,8 +68,16 @@ static gint vkaudiofs_oper_release(const gchar *path, struct fuse_file_info *fi)
         return -ENOENT;
     }
     
-    curl_easy_cleanup(file_item->curl_instance);
-
+    pthread_mutex_lock(&file_item->lock);
+    
+    if (file_item->curl_instance != NULL)
+    {
+        curl_easy_cleanup(file_item->curl_instance);
+        file_item->curl_instance = NULL;
+    }
+    
+    pthread_mutex_unlock(&file_item->lock);
+    
     return 0;
 }
 
@@ -87,12 +96,19 @@ static gint vkaudiofs_oper_open(const gchar *path, struct fuse_file_info *fi)
         return -ENOENT;
     }
     
-    file_item->curl_instance = curl_easy_init();
+    pthread_mutex_lock(&file_item->lock);
+    
+    if(file_item->curl_instance == NULL)
+    {
+        file_item->curl_instance = curl_easy_init();
+    }
 
 	if ((fi->flags & 3) != O_RDONLY)
     {
 		return -EACCES;
     }
+    
+    pthread_mutex_unlock(&file_item->lock);
     
 	return 0;
 }
@@ -135,21 +151,25 @@ static gint vkaudiofs_oper_read(const gchar* path, gchar* rbuf, gsize size, off_
     gchar *buffer = NULL;
     gchar *file_name = g_path_get_basename(path);
     gsize bytes_received = 0;
-    vkaudiofs_audio_file *audio_file = vkaudiofs_get_file_by_name(file_name);
+    vkaudiofs_audio_file *file_item = vkaudiofs_get_file_by_name(file_name);
     
     g_free(file_name);
     
-    if (audio_file == NULL)
+    if (file_item == NULL)
     {
         return -EIO;
     }
     
-    bytes_received = vkaudiofs_get_remote_file(audio_file, size, offset, &buffer);
+    pthread_mutex_lock(&file_item->lock);
+    
+    bytes_received = vkaudiofs_get_remote_file(file_item, size, offset, &buffer);
     
     memcpy(rbuf, buffer, bytes_received);
     
+    pthread_mutex_unlock(&file_item->lock);
+    
     g_free(buffer);
-
+    
     return (gint)bytes_received;
 }
 
