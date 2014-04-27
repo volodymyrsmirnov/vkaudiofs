@@ -108,13 +108,13 @@ static gint vkaudiofs_oper_open(const gchar *path, struct fuse_file_info *fi)
     {
         file_item->curl_instance = curl_easy_init();
     }
+    
+    pthread_mutex_unlock(&file_item->lock);
 
 	if ((fi->flags & 3) != O_RDONLY)
     {
 		return -EACCES;
     }
-    
-    pthread_mutex_unlock(&file_item->lock);
     
 	return 0;
 }
