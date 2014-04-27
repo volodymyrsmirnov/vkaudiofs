@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		B2D9BC1519094B8B00A6EFE3 /* vk_api.c in Sources */ = {isa = PBXBuildFile; fileRef = B2D9BC1419094B8B00A6EFE3 /* vk_api.c */; };
 		B2DCE681190C48750035E607 /* vkaudiofs.c in Sources */ = {isa = PBXBuildFile; fileRef = B2DCE680190C48750035E607 /* vkaudiofs.c */; };
-		B2DCE696190CEA430035E607 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = B2DCE695190CEA430035E607 /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +18,7 @@
 		B2DCE687190CC0790035E607 /* vk_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vk_api.h; sourceTree = "<group>"; };
 		B2DCE694190CE8160035E607 /* VKAudioFS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VKAudioFS; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2DCE695190CEA430035E607 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		B2DCE697190CEB720035E607 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +35,7 @@
 		B2D9BBFE1908EF7800A6EFE3 = {
 			isa = PBXGroup;
 			children = (
+				B2DCE697190CEB720035E607 /* Readme.md */,
 				B2DCE695190CEA430035E607 /* Makefile */,
 				B2DCE685190CBFDA0035E607 /* include */,
 				B2D9BC091908EF7800A6EFE3 /* src */,
@@ -110,7 +111,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2DCE696190CEA430035E607 /* Makefile in Sources */,
 				B2DCE681190C48750035E607 /* vkaudiofs.c in Sources */,
 				B2D9BC1519094B8B00A6EFE3 /* vk_api.c in Sources */,
 			);

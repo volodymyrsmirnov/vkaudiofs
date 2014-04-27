@@ -182,9 +182,9 @@ static int vkaudiofs_opt_proc(void *data, const char *arg, int key, struct fuse_
     
     switch (key) {
         case KEY_HELP:
-            g_print("FUSE virtual FS for your Vkontakte audio records.\n"
+            g_print("FUSE virtual file system for VK (VKontakte) audio records.\n"
                     "\n"
-                    "Please note the filesystem does not handle remote playlist updates.\nYou have to remount FS on adding or removing files from your list manually.\n"
+                    "Please note the filesystem does not handle remote playlist updates.\nYou have to remount FS manually on adding or removing files from your audio list on VK.\n"
                     "\n"
                     "VKAudioFS options:\n"
                     "    --oauth                get OAuth authentication URL\n"
