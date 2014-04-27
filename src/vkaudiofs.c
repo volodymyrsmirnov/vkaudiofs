@@ -52,26 +52,6 @@ static gint vkaudiofs_oper_getattr(const gchar *path, struct stat *stbuf)
     return 0;
 }
 
-static gint vkaudiofs_oper_release(const gchar *path, struct fuse_file_info *fi)
-{
-    (void) fi;
-    
-    gchar *file_name = g_path_get_basename(path);
-    
-    vkaudiofs_audio_file *file_item = vkaudiofs_get_file_by_name(file_name);
-    
-    g_free(file_name);
-    
-    if (file_item == NULL)
-    {
-        return -ENOENT;
-    }
-    
-    curl_easy_cleanup(file_item->curl_instance);
-
-    return 0;
-}
-
 static gint vkaudiofs_oper_open(const gchar *path, struct fuse_file_info *fi)
 {
     (void) fi;
@@ -87,8 +67,6 @@ static gint vkaudiofs_oper_open(const gchar *path, struct fuse_file_info *fi)
         return -ENOENT;
     }
     
-    file_item->curl_instance = curl_easy_init();
-
 	if ((fi->flags & 3) != O_RDONLY)
     {
 		return -EACCES;
@@ -158,7 +136,6 @@ static struct fuse_operations vkaudiofs_oper = {
     .getattr = vkaudiofs_oper_getattr,
     .readdir = vkaudiofs_oper_readdir,
     .open = vkaudiofs_oper_open,
-    .release = vkaudiofs_oper_release
 };
 
 static struct fuse_opt vkaudiofs_opts[] = {

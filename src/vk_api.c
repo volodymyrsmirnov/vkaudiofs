@@ -108,6 +108,8 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config)
             
             audio_files[idx].file_name = g_strdelimit(g_strdup_printf("%s - %s.%d.mp3", audio_files[idx].artist, audio_files[idx].title, audio_files[idx].id), "/ ", '_');
             
+            audio_files[idx].curl_instance = curl_easy_init();
+            
             g_hash_table_replace(config->files_id_table, &audio_files[idx].id, &audio_files[idx]);
             g_hash_table_replace(config->files_name_table, audio_files[idx].file_name, &audio_files[idx]);
         }
