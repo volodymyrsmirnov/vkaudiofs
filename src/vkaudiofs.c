@@ -264,6 +264,8 @@ int main(gint argc, gchar * argv[])
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     fuse_opt_parse(&args, &vkaudiofs_config, vkaudiofs_opts, vkaudiofs_opt_proc);
     
+    fuse_opt_add_arg(&args, "-r");
+    
     if (vkaudiofs_config.user_id == 0)
     {
         g_critical("Please provide --user_id, see --help for details.");
