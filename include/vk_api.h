@@ -49,6 +49,6 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config);
 vkaudiofs_audio_file * vkaudiofs_get_file_by_name(gchar *file_name);
 
 gsize vkaudiofs_get_remote_file_size(gchar *url);
-gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, goffset offset, gchar **buffer);
+gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, off_t offset, gchar **buffer);
 
 #endif

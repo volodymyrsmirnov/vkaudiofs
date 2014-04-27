@@ -48,7 +48,7 @@ gint vkaudiofs_call_api(gchar *method, gchar *query, gchar **response)
     if (curl)
     {
         curl_easy_setopt(curl, CURLOPT_URL, api_query_url);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, vkaudiofs_write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
         
         response_status = curl_easy_perform(curl);
@@ -159,8 +159,8 @@ gsize vkaudiofs_get_remote_file_size(gchar *url)
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_HEADER, 1);
         curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, vkaudiofs_dummy_write);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, vkaudiofs_content_length_header);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_dummy_write);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, (curl_write_callback)vkaudiofs_content_length_header);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, &content_length);
         
         response_status = curl_easy_perform(curl);
@@ -176,10 +176,10 @@ gsize vkaudiofs_get_remote_file_size(gchar *url)
     return 0;
 }
 
-gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, goffset offset, gchar **buffer)
+gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, off_t offset, gchar **buffer)
 {
     CURLcode response_status = CURLE_OK;
-    gchar *request_range = g_strdup_printf("%ld-%lu", offset, offset + size - 1);
+    gchar *request_range = g_strdup_printf("%lld-%llu", offset, offset + size - 1);
     
     struct vkaudiofs_api_response response_data;
     response_data.size = 0;
@@ -189,7 +189,7 @@ gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, go
     
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_URL, audio_file->url);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_RANGE, request_range);
-    curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEFUNCTION, vkaudiofs_write_data);
+    curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_write_data);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEDATA, &response_data);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_TCP_KEEPALIVE, 1L);
     
