@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <locale.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <time.h>
 
 #include <glib.h>
 #include <fuse.h>
@@ -48,12 +50,16 @@ static gint vkaudiofs_oper_getattr(const gchar *path, struct stat *stbuf)
 		stbuf->st_mode = S_IFREG | 0444;
 		stbuf->st_nlink = 1;
         stbuf->st_size = file_item->size;
+        stbuf->st_uid = getuid();
+        stbuf->st_gid = getgid();
+        
+        stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = time(NULL);
     }
     
     return 0;
 }
 
-static gint vkaudiofs_oper_release(const gchar *path, struct fuse_file_info *fi)
+static gint vkaudiofs_oper_flush(const gchar *path, struct fuse_file_info *fi)
 {
     (void) fi;
     
@@ -178,7 +184,7 @@ static struct fuse_operations vkaudiofs_oper = {
     .getattr = vkaudiofs_oper_getattr,
     .readdir = vkaudiofs_oper_readdir,
     .open = vkaudiofs_oper_open,
-    .release = vkaudiofs_oper_release
+    .flush = vkaudiofs_oper_flush
 };
 
 static struct fuse_opt vkaudiofs_opts[] = {
