@@ -59,7 +59,7 @@ static gint vkaudiofs_oper_getattr(const gchar *path, struct stat *stbuf)
     return 0;
 }
 
-static gint vkaudiofs_oper_flush(const gchar *path, struct fuse_file_info *fi)
+static gint vkaudiofs_oper_release(const gchar *path, struct fuse_file_info *fi)
 {
     (void) fi;
     
@@ -184,7 +184,7 @@ static struct fuse_operations vkaudiofs_oper = {
     .getattr = vkaudiofs_oper_getattr,
     .readdir = vkaudiofs_oper_readdir,
     .open = vkaudiofs_oper_open,
-    .flush = vkaudiofs_oper_flush
+    .release = vkaudiofs_oper_release
 };
 
 static struct fuse_opt vkaudiofs_opts[] = {

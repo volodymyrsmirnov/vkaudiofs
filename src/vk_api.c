@@ -193,7 +193,7 @@ gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, of
     response_data.data = g_malloc(size);
     
     curl_easy_reset(audio_file->curl_instance);
-    
+ 
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_URL, audio_file->url);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_VERBOSE, FALSE);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_RANGE, request_range);
