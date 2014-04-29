@@ -2,6 +2,8 @@
 
 ## Description
 
+[![Build Status](https://travis-ci.org/mindcollapse/vkaudiofs.svg?branch=master)](https://travis-ci.org/mindcollapse/vkaudiofs)
+
 VKAudioFS gives you a possibility to mount your audio records as a simple directory is OSX or Linux and use your favourite audio player with them. 
 
 **IMPOTANT**: you are allowed to use this file system only for listening your music in applications. Copying mounted files to another directory violates paragraph 12 of API user agreement published at [http://vk.com/dev/rules](http://vk.com/dev/rules) and may lead to the termination of your account and to the Russian military invasion in your country. 

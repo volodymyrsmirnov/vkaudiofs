@@ -185,7 +185,7 @@ gint vkaudiofs_get_remote_file_size(vkaudiofs_audio_file *audio_file)
 gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, off_t offset, gchar **buffer)
 {
     CURLcode response_status = CURLE_OK;
-    gchar *request_range = g_strdup_printf("%lld-%llu", offset, offset + size - 1);
+    gchar *request_range = g_strdup_printf("%llu-%llu", (long long unsigned int)offset, (long long unsigned int)(offset + size - 1));
     
     struct vkaudiofs_api_response response_data;
     response_data.size = 0;
