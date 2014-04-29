@@ -1,0 +1,9 @@
+language: c
+compiler:
+    - clang
+    - gcc
+install:
+    - "sudo apt-get update"
+    - "sudo apt-get install pkg-config libcurl4-openssl-dev libfuse-dev libglib2.0-dev libjson0-dev"
+script: "make"
+    

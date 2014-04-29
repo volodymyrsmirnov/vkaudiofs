@@ -53,7 +53,7 @@ static gint vkaudiofs_oper_getattr(const gchar *path, struct stat *stbuf)
         stbuf->st_uid = getuid();
         stbuf->st_gid = getgid();
         
-        stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = time(NULL);
+        stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = (time_t)file_item->time;
     }
     
     return 0;
@@ -142,7 +142,7 @@ static gint vkaudiofs_oper_readdir(const gchar *path, gpointer buf, fuse_fill_di
     {
         audio_file = iterator->data;
         
-        filler(buf, audio_file->file_name, NULL, 0);
+        filler(buf, audio_file->name, NULL, 0);
     }
     
     g_free(iterator);
@@ -250,6 +250,7 @@ int main(gint argc, gchar * argv[])
     GList *iterator = NULL;
     gint file_number = 0;
     gsize cached_file_size = 0;
+    glong cached_file_time = 0;
     gsize cache_file_data_size = 0;
     gchar *progress = NULL;
     gchar *cache_file_path = g_build_path(G_DIR_SEPARATOR_S, g_get_user_cache_dir(), "vkaudiofs", NULL);
@@ -322,14 +323,16 @@ int main(gint argc, gchar * argv[])
         audio_file_id_key = g_strdup_printf("%d", audio_file->id);
         
         cached_file_size = g_key_file_get_uint64(cache_file, "file_size_cache", audio_file_id_key, NULL);
+        cached_file_time = g_key_file_get_uint64(cache_file, "file_time_cache", audio_file_id_key, NULL);
         
-        if (cached_file_size > 0)
+        if (cached_file_size > 0 && cached_file_time > 0)
         {
             audio_file->size = cached_file_size;
+            audio_file->time = cached_file_time;
         }
         else
         {
-            audio_file->size = vkaudiofs_get_remote_file_size(audio_file->url);
+            vkaudiofs_get_remote_file_size(audio_file);
         }
         
         size_formatted = g_format_size(audio_file->size);
@@ -338,6 +341,7 @@ int main(gint argc, gchar * argv[])
         g_print("%s\n", progress);
         
         g_key_file_set_uint64(cache_file, "file_size_cache", audio_file_id_key, audio_file->size);
+        g_key_file_set_uint64(cache_file, "file_time_cache", audio_file_id_key, audio_file->time);
         
         g_free(progress);
         g_free(size_formatted);

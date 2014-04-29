@@ -33,11 +33,12 @@ typedef struct vkaudiofs_audio_file {
     gchar *artist;
     gchar *title;
     gchar *url;
-    gchar *file_name;
+    gchar *name;
     gsize size;
+    glong time;
     
     pthread_mutex_t lock;
-    
+
     CURL *curl_instance;
 } vkaudiofs_audio_file;
 
@@ -50,7 +51,7 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config);
 
 vkaudiofs_audio_file * vkaudiofs_get_file_by_name(gchar *file_name);
 
-gsize vkaudiofs_get_remote_file_size(gchar *url);
+gint vkaudiofs_get_remote_file_size(vkaudiofs_audio_file *audio_file);
 gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, off_t offset, gchar **buffer);
 
 #endif

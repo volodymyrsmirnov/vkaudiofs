@@ -97,7 +97,7 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config)
         
         audio_response_object = json_object_object_get(audio_response_object, "items");
         
-        audio_files = g_malloc(sizeof(vkaudiofs_audio_file) * json_object_array_length(audio_response_object));
+        audio_files = g_malloc(sizeof(struct vkaudiofs_audio_file) * json_object_array_length(audio_response_object));
         
         for (gint idx = 0; idx < json_object_array_length(audio_response_object); idx++)
         {
@@ -107,15 +107,17 @@ gint vkaudiofs_get_audio_files(struct vkaudiofs_config_t *config)
             audio_files[idx].artist = (gchar *)json_object_get_string(json_object_object_get(response_item_json_obj, "artist"));
             audio_files[idx].title = (gchar *)json_object_get_string(json_object_object_get(response_item_json_obj, "title"));
             audio_files[idx].url = (gchar *)json_object_get_string(json_object_object_get(response_item_json_obj, "url"));
+            audio_files[idx].name = g_strdelimit(g_strdup_printf("%s - %s.%d.mp3", audio_files[idx].artist, audio_files[idx].title, audio_files[idx].id), "/ ", '_');
             
-            audio_files[idx].file_name = g_strdelimit(g_strdup_printf("%s - %s.%d.mp3", audio_files[idx].artist, audio_files[idx].title, audio_files[idx].id), "/ ", '_');
+            audio_files[idx].time = 0;
+            audio_files[idx].size = 0;
             
             audio_files[idx].curl_instance = NULL;
-
+            
             pthread_mutex_init(&audio_files[idx].lock, NULL);
             
             g_hash_table_replace(config->files_id_table, &audio_files[idx].id, &audio_files[idx]);
-            g_hash_table_replace(config->files_name_table, audio_files[idx].file_name, &audio_files[idx]);
+            g_hash_table_replace(config->files_name_table, audio_files[idx].name, &audio_files[idx]);
         }
         
         config->files_number = g_hash_table_size(config->files_id_table);
@@ -131,22 +133,7 @@ vkaudiofs_audio_file * vkaudiofs_get_file_by_name(gchar *file_name)
     return g_hash_table_lookup(vkaudiofs_config.files_name_table, file_name);
 }
 
-gsize vkaudiofs_content_length_header(gpointer ptr, gsize size, gsize nmemb, gpointer stream)
-{
-    gint result = 0;
-    glong content_length = 0;
-
-    result = sscanf((gchar *)ptr, "Content-Length: %ld\n", &content_length);
-    
-    if (result)
-    {
-        *((gsize *) stream) = content_length;
-    }
-    
-    return size * nmemb;
-}
-
-gsize vkaudiofs_dummy_write(gchar *ptr, gsize size, gsize nmemb, gpointer userdata)
+gsize vkaudiofs_write_data_dummy(gchar *ptr, gsize size, gsize nmemb, gpointer userdata)
 {
     (void) ptr;
     (void) userdata;
@@ -154,33 +141,45 @@ gsize vkaudiofs_dummy_write(gchar *ptr, gsize size, gsize nmemb, gpointer userda
     return size * nmemb;
 }
 
-gsize vkaudiofs_get_remote_file_size(gchar *url)
+gint vkaudiofs_get_remote_file_size(vkaudiofs_audio_file *audio_file)
 {
     CURL *curl = curl_easy_init();
     CURLcode response_status = CURLE_OK;
-    gsize content_length = 0;
+    gdouble content_length = 0;
     
     if (curl)
     {
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_HEADER, 1);
-        curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
+        curl_easy_setopt(curl, CURLOPT_URL, audio_file->url);
+        curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
+        curl_easy_setopt(curl, CURLOPT_NOBODY, TRUE);
+        curl_easy_setopt(curl, CURLOPT_FILETIME, TRUE);
         curl_easy_setopt(curl, CURLOPT_VERBOSE, FALSE);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_dummy_write);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, (curl_write_callback)vkaudiofs_content_length_header);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_write_data_dummy);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, &content_length);
         
         response_status = curl_easy_perform(curl);
-                
-        curl_easy_cleanup(curl);
-        
+
         if (response_status == CURLE_OK)
         {
-             return content_length;
+            if (curl_easy_getinfo(curl, CURLINFO_FILETIME, &audio_file->time) != CURLE_OK)
+            {
+                audio_file->time = time(NULL);
+            }
+            
+            if (curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_length) != CURLE_OK)
+            {
+                content_length = 0.0;
+            }
+            
+            audio_file->size = content_length;
         }
+        
+        curl_easy_cleanup(curl);
+        
+        return VKAUDIOFS_API_RESULT_SUCCESS;
     }
     
-    return 0;
+    return VKAUDIOFS_API_RESULT_ERROR;
 }
 
 gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, off_t offset, gchar **buffer)
@@ -196,6 +195,7 @@ gsize vkaudiofs_get_remote_file(vkaudiofs_audio_file *audio_file, gsize size, of
  
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_URL, audio_file->url);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_VERBOSE, FALSE);
+    curl_easy_setopt(audio_file->curl_instance, CURLOPT_NOSIGNAL, TRUE);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_RANGE, request_range);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEFUNCTION, (curl_write_callback)vkaudiofs_write_data);
     curl_easy_setopt(audio_file->curl_instance, CURLOPT_WRITEDATA, &response_data);

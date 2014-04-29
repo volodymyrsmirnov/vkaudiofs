@@ -12,6 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B276082C190F7F03006ACE0C /* .travis.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
 		B2D9BC1419094B8B00A6EFE3 /* vk_api.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vk_api.c; sourceTree = "<group>"; };
 		B2DCE680190C48750035E607 /* vkaudiofs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vkaudiofs.c; sourceTree = "<group>"; };
 		B2DCE686190CC0790035E607 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -35,6 +36,7 @@
 		B2D9BBFE1908EF7800A6EFE3 = {
 			isa = PBXGroup;
 			children = (
+				B276082C190F7F03006ACE0C /* .travis.yml */,
 				B2DCE697190CEB720035E607 /* Readme.md */,
 				B2DCE695190CEA430035E607 /* Makefile */,
 				B2DCE685190CBFDA0035E607 /* include */,
